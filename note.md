@@ -32,3 +32,8 @@
     - Machine learning algorithms can only be as good as the data it is trained on
     - Machine learning models do not understand the impact of a false negative vs. a false positive diagnostic (at least not like humans can)
     - For many of the clinicians and the patients, the models are a black box.
+
+##### Perceptron
+- Already taken in Basic of Machine Learning course
+
+##### Getting started with TensorFlow
