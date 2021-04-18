@@ -37,3 +37,30 @@
 - Already taken in Basic of Machine Learning course
 
 ##### Getting started with TensorFlow
+
+##### Implementing neural network
+- One-hot encoding for categorical features: `features = pd.get_dummies(features)`
+- Train/test split
+- Standardize/normalize numerical features
+```py
+from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import Normalizer
+from sklearn.compose import ColumnTransformer
+ 
+ct = ColumnTransformer([('normalize', Normalizer(), ['age', 'bmi', 'children'])], remainder='passthrough') #returns NumPy arrays
+features_train = ct.fit_transform(features_train)
+features_test = ct.transform(features_test)
+
+#convert a NumPy array back into a pandas DataFrame
+features_train_norm = pd.DataFrame(features_train_norm, columns = features_train.columns)
+# Note that we fit the scaler to the training data only, and then we apply the trained scaler onto the test data. This way we avoid “information leakage” from the training set to the test set.
+```
+- tf.keras.Sequential:
+    - A sequential model, as the name suggests, allows us to create models layer-by-layer in a step-by-step fashion. This model can have only one input tensor and only one output tensor:
+    ```py
+    from tensorflow.keras.models import Sequential
+    my_model = Sequential(name="my first model")
+    my_model = design_model(features_train)
+    print(my_model.layers)  #The model’s layers are accessed via the layers attribute
+    ```
+    
