@@ -60,7 +60,57 @@ features_train_norm = pd.DataFrame(features_train_norm, columns = features_train
     ```py
     from tensorflow.keras.models import Sequential
     my_model = Sequential(name="my first model")
-    my_model = design_model(features_train)
+    my_model = design_model(features_train)  #refer to def design_model in script.py
     print(my_model.layers)  #The model’s layers are accessed via the layers attribute
     ```
+    - Layers:
+    ```py
+    from tensorflow.keras import layers
+    # we chose 3 neurons here
+    layer = layers.Dense(3) 
+    ```
+    - Input layer:
+    ```py
+    from tensorflow.keras.layers import InputLayer
+    my_input = InputLayer(input_shape=(15,)) #vinitializes an input layer for a DataFrame my_data that has 15 columns
+    
+    # OR avoiding hard-coding
+    num_features = my_data.shape[1] 
+    my_input = tf.keras.layers.InputLayer   (input_shape=(num_features,)) 
+
+    # Add input layer to model
+    my_model.add(my_input)
+    print(my_model.summary())
+    ```
+    - Output layer
+    ```py
+    from tensorflow.keras.layers import Dense
+    my_model.add(Dense(1))
+    ```
+- our model currently represents a linear regression. To capture more complex or non-linear interactions among the inputs and outputs neural networks, we’ll need to incorporate hidden layers.
+```py
+from tensorflow.keras.layers import Dense
+my_model.add(Dense(64, activation='relu'))
+# We chose 64 (2^6) to be the number of neurons since it makes optimization more efficient due to the binary nature of computation.
+```
+- There are a number of activation functions such as softmax, sigmoid, but ReLU (relu) (Rectified Linear Unit) is very effective in many applications and we’ll use it here.
+- Adding more layers to a neural network naturally increases the number of parameters to be tuned.
+- Keras offers a variety of optimizers such as SGD (Stochastic Gradient Descent optimizer), Adam, RMSprop.
+- While model parameters are the ones that the model uses to make predictions, hyperparameters determine the learning process (learning rate, number of iterations, optimizer type).
+```py
+from tensorflow.keras.optimizers import Adam
+opt = Adam(learning_rate=0.01)
+```
+- a model instance my_model is compiled:
+```py
+my_model.compile(loss='mse',  metrics=['mae'], optimizer=opt)
+# loss denotes the measure of learning success and the lower the loss the better the performance. 
+# we want to observe the progress of the Mean Absolute Error (mae) while training the model because MAE can give us a better idea than MSE on how far off we are from the true values in the units we are predicting
+```
+- Training model: `my_model.fit(my_data, my_labels, epochs=50, batch_size=3, verbose=1)`
+    - epochs refers to the number of cycles through the full training dataset. Since training of neural networks is an iterative process, you need multiple passes through data.
+    - batch_size is the number of data points to work through before updating the model parameters. It is also a hyperparameter that can be tuned.
+    - verbose = 1 will show you the progress bar of the training.
+- Evaluating model: `val_mse, val_mae = my_model.evaluate(my_data, my_labels, verbose = 0)`
+    - In our case, model.evaluate() returns the value for our chosen loss metrics (mse) and for an additional metrics (mae).
     
