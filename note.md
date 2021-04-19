@@ -113,4 +113,60 @@ my_model.compile(loss='mse',  metrics=['mae'], optimizer=opt)
     - verbose = 1 will show you the progress bar of the training.
 - Evaluating model: `val_mse, val_mae = my_model.evaluate(my_data, my_labels, verbose = 0)`
     - In our case, model.evaluate() returns the value for our chosen loss metrics (mse) and for an additional metrics (mae).
-    
+
+##### Hyperparameter tuning
+- Hyperparameters are chosen on a held-out set called validation set
+```py
+my_model.fit(data, labels, epochs = 20, batch_size = 1, verbose = 1,  validation_split = 0.2)
+```
+- The batch size that determines how many training samples are seen before updating the network’s parameters (weight and bias matrices).
+An advantage of using batches is for GPU computation that can parallelize neural network computations.
+    - When the batch contains all the training examples, the process is called batch gradient descent. 
+    - If the batch has one sample, it is called the stochastic gradient descent. 
+    - When 1 < batch size < number of training points, is called mini-batch gradient descent. 
+    - Probably bad performance for larger batch sizes. A good trick is to increase the learning rate!
+- The number of epochs is a hyperparameter representing the number of complete passes through the training dataset. This is typically a large number (100, 1000, or larger). If the data is split into batches, in one epoch the optimizer will see all the batches.
+    - Choose number of epochs: one trick is  early stopping: when the training performance reaches the plateau or starts degrading, the learning stops.
+    ```py
+    from tensorflow.keras.callbacks import EarlyStopping
+    stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=40)
+    history = model.fit(features_train, labels_train, epochs=num_epochs, batch_size=16, verbose=0, validation_split=0.2, callbacks=[stop])
+    #monitor = val_loss, which means we are monitoring the validation loss to decide when to stop the training
+    #mode = min, which means we seek minimal loss
+    #patience = 40, which means that if the learning reaches a plateau, it will continue for 40 more epochs in case the plateau leads to improved performance
+    ```
+- Adding hidden layer:
+    - The validation curve is below the training curve. This means that the training curve can get better at some point, but the model complexity doesn’t allow it. This phenomenon is called underfitting. Can also notice that no early stopping occurs.
+    - The rule of thumb is to start with one hidden layer and add as many units as we have features in the dataset. However, this might not always work. We need to try things out and observe our learning curve.
+
+- Towards automated tuning: grid and random search. Random Search goes through random combinations of hyperparameters and doesn’t try them all.
+    - Grid search in Keras: first wrap the neural network model in to a `KerasRegressor`:
+    ```py
+    model = KerasRegressor(build_fn=design_model)
+    batch_size = [10, 40]
+    epochs = [10, 50]
+    param_grid = dict(batch_size=batch_size, epochs=epochs)
+    # Initialize a GridSearchCV object and fit the model
+    grid = GridSearchCV(estimator = model, param_grid=param_grid, scoring = make_scorer(mean_squared_error, greater_is_better=False))
+    grid_result = grid.fit(features_train, labels_train, verbose = 0)
+    # we initialized the scoring parameter with scikit-learn’s .make_scorer() method. We’re evaluating our hyperparameter combinations with a mean squared error making sure that greater_is_better is set to False since we are searching for a set of hyperparameters that yield us the smallest error.
+    ```
+    - Randomized search in Keras:  change our hyperparameter grid specification for the randomized search in order to have more options:
+    ```py
+    param_grid = {'batch_size': sp_randint(2, 16), 'nb_epoch': sp_randint(10, 100)}
+    # Randomized search will sample values for batch_size and nb_epoch from uniform distributions in the interval [2, 16] and [10, 100], respectively, for a fixed number of iterations. In our case, 12 iterations:
+    grid = RandomizedSearchCV(estimator = model, param_distributions=param_grid, scoring = make_scorer(mean_squared_error, greater_is_better=False), n_iter = 12)
+    ```
+    - Regularization is a set of techniques that prevent the learning process to completely fit the model to the training data which can lead to overfitting. It makes the model simpler, smooths out the learning curve, and hence makes it more ‘regular’.
+        - The most common regularization method is dropout: randomly ignores, or “drops out” a number of outputs of a layer by setting them to zeros
+- A baseline result is the simplest possible prediction. 
+```py
+# Scikit-learn provides DummyRegressor, which serves as a baseline regression algorithm. We’ll choose mean (average) as our central tendency measure.
+from sklearn.dummy import DummyRegressor
+from sklearn.metrics import mean_absolute_error
+dummy_regr = DummyRegressor(strategy="mean")
+dummy_regr.fit(features_train, labels_train)
+y_pred = dummy_regr.predict(features_test)
+MAE_baseline = mean_absolute_error(labels_test, y_pred)
+print(MAE_baseline)
+```
