@@ -170,3 +170,8 @@ y_pred = dummy_regr.predict(features_test)
 MAE_baseline = mean_absolute_error(labels_test, y_pred)
 print(MAE_baseline)
 ```
+
+##### Classification
+- Multi-class classification has the same idea behind binary classification, except instead of two possible outcomes, there are three or more.
+- In multi-label classification, there are multiple possible labels for each outcome. This is useful for customer segmentation, image categorization, and sentiment analysis for understanding text. To perform these classifications, we use models like Naive Bayes, K-Nearest Neighbors, SVMs, as well as various deep learning models.
+- Cross-entropy is a score that summarizes the average difference between the actual and predicted probability distributions for all classes. 
