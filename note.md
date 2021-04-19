@@ -175,3 +175,11 @@ print(MAE_baseline)
 - Multi-class classification has the same idea behind binary classification, except instead of two possible outcomes, there are three or more.
 - In multi-label classification, there are multiple possible labels for each outcome. This is useful for customer segmentation, image categorization, and sentiment analysis for understanding text. To perform these classifications, we use models like Naive Bayes, K-Nearest Neighbors, SVMs, as well as various deep learning models.
 - Cross-entropy is a score that summarizes the average difference between the actual and predicted probability distributions for all classes. 
+    - log_loss() function in scikit-learn
+- Datatrain.info()
+- The following commands show us which categories we have in the item column and what their distribution is:
+```py
+from collections import Counter
+print('Classes and number of values in the dataset`,Counter(data_train[“item”]))
+#{‘lamps’: 75, ‘tableware’: 125, 'containers': 100}
+```
