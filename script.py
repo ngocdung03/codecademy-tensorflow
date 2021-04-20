@@ -685,3 +685,33 @@ y_estimate = model.predict(x_test)
 y_estimate = np.argmax(y_estimate, axis=1)
 y_true = np.argmax(y_test, axis=1)
 print(classification_report(y_true, y_estimate))
+
+### Image classification
+## Preprocesing and augmentation
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+#Creates an ImageDataGenerator:
+training_data_generator = ImageDataGenerator(rescale=1.0/255, zoom_range=0.2, rotation_range=15,width_shift_range=0.05, height_shift_range=0.05)  #perform pixel normalization and data augmentation
+
+#Prints its attributes:
+print(training_data_generator.__dict__)
+
+## Loading image data
+from preprocess import training_data_generator
+
+DIRECTORY = "data/train"
+CLASS_MODE = "categorical"  #When we train our model, we will be using a categorical loss function, which will expect labels to be in a onehot format
+COLOR_MODE = "grayscale"
+TARGET_SIZE = (256,256)
+BATCH_SIZE = 32
+
+#Creates a DirectoryIterator object using the above parameters:
+
+training_iterator = training_data_generator.flow_from_directory(DIRECTORY,class_mode=CLASS_MODE,color_mode=COLOR_MODE,target_size=TARGET_SIZE,batch_size=BATCH_SIZE)
+
+# we can iterate over the training batches using the .next() method.
+sample_batch_input,sample_batch_labels  = training_iterator.next()
+print(sample_batch_input.shape,sample_batch_labels.shape)
+#Found 200 images belonging to 2 classes.
+#(32, 256, 256, 1) (32, 2)
+# The last dimension is the number of channels. Because these are grayscale images, there is only one channel representing light intensity. Sample_batch_labels should be shape of (32,2), because an image can be labeled Normal ([1,0]) or Pneumonia ([0,1]).

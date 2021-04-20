@@ -235,3 +235,17 @@ print(classification_report(y_true, yhat_classes))
     - Other hyperparameters you might consider changing are: the batch size number of hidden layers number of units per hidden layer the learning rate of the optimizer the optimizer and so on.
 
 ##### Image classification
+- Use ImageDataGenerators to load images from a file path, and to preprocess them: `my_image_data_generator = ImageDataGenerator()`
+- There are a few ways to preprocess image data, but we will focus on the most important step: pixel normalization. Because neural networks struggle with large integer values, we want to rescale our raw pixel values between 0 and 1. Our pixels have values in [0,255], so we can normalize pixels by dividing each pixel by 255.0.
+- Can also use ImageDataGenerator for data augmentation: generating more data without collecting any new images. Common way is to randomly flip or shift each image by small amounts: `my_augmented_image_data_generator = ImageDataGenerator( vertical_flip = True )`
+- Loading image data: using .flow_from_directory() method. Arguments:
+    - directory : A string that defines the path to the folder containing our training data.
+    - class_mode : How we should represent the labels in our data. “For example, we can set this to "categorical" to return our labels as one-hot arrays, with a 1 in the correct class slot.
+    - color_mode : Specifies the type of image. For example, we set this to "grayscale" for black and white images, or to "rgb" (Red-Green-Blue) for color images.
+    - target_size : A tuple specifying the height and width of our image. Every image in the directory will be resized into this shape.
+    - batch_size : The batch size of our data.
+- Once we have used these parameters to create our DirectoryIterator, we can iterate over the training batches using the .next() method.
+```py
+sample_batch_input,sample_batch_labels  = training_iterator.next()
+print(sample_batch_input.shape,sample_batch_labels.shape)
+```
