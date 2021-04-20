@@ -183,3 +183,55 @@ from collections import Counter
 print('Classes and number of values in the dataset`,Counter(data_train[“item”]))
 #{‘lamps’: 75, ‘tableware’: 125, 'containers': 100}
 ```
+- convert the label vectors to integers ranging from 0 to the number of classes by using sklearn.preprocessing.LabelEncoder:
+```py
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+train_y=le.fit_transform(train_y.astype(str))
+test_y=le.transform(test_y.astype(str))
+# We can print the resulting mappings
+integer_mapping = {l: i for i, l in enumerate(le.classes_)}
+print(integer_mapping)
+# Convert to categorical format
+train_y = tensorflow.keras.utils.to_categorical(train_y, dtype = ‘int64’)
+test_y = tensorflow.keras.utils.to_categorical(test_y, dtype = ‘int64’)  
+```
+- For regression, we don’t use any activation function in the final layer because we needed to predict a number without any transformations. However, for classification:
+    - vector of categorical probabilities: softmax activation function that outputs a vector with elements having values between 0 and 1 and that sum to 1 
+    - binary classification problem: a sigmoid activation function paired with the binary_crossentropy loss.
+- Setting the optimizer:
+    - First, to specify the use of cross-entropy when optimizing the model, we need to set the loss parameter to categorical_crossentropy of the Model.compile() method.
+    - Second, we also need to decide which metrics to use to evaluate our model. For classification, we usually use accuracy.
+    - Finally, we will use Adam as our optimizer because it’s effective here and is commonly used.
+- Train and evaluate models:
+    - We take two outputs out of the .evaluate() function:
+        - the value of the loss (categorical_crossentropy)
+        - accuracy (as set in the metrics parameter of .compile()).
+```py
+my_model.fit(my_data, my_labels, epochs=10, batch_size=1, verbose=1)
+loss, acc = my_model.evaluate(my_test, test_labels, verbose=0)
+```
+- Sometimes having only accuracy reported is not enough or adequate. Accuracy is often used when data is balanced, meaning it contains an equal or almost equal number of samples from all the classes. However, oftentimes data comes imbalanced, Eg. rare disease.
+- Frequently, especially in medicine, false negatives and false positives have different consequences.
+- F1-score is a helpful way to evaluate our model based on how badly it makes false negative mistakes:
+```py
+import numpy as np
+from sklearn.metrics import classification_report
+yhat_classes = np.argmax(my_model.predict(my_test), axis = 1)   #or axis=-1?
+y_true = np.argmax(my_test_labels, axis=1)
+print(classification_report(y_true, yhat_classes))
+# predict classes for all test cases my_test using the .predict() method and assign the result to the yhat_classes variable.
+# using .argmax() convert the one-hot-encoded labels my_test_labels into the index of the class the sample belongs to. The index corresponds to our class encoded as an integer.
+# use the .classification_report() method to calculate all the metrics.
+```
+- There is another type of loss – sparse categorical cross-entropy – which is a computationally modified categorical cross-entropy loss that allows you to leave the integer labels as they are and skip the entire procedure of encoding.
+    - save time in memory as well as computation because it uses a single integer for a class, rather than a whole vector. This is especially useful when we have data with many classes to predict.
+    ```py
+    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    # make sure that our labels are just integer encoded using the LabelEncoder() but not converted into one-hot-encodings using .to_categorical()
+    ```
+- Tweak the model: see if it can be improved
+    - The first thing we can try is to increase the number of epochs.
+    - Other hyperparameters you might consider changing are: the batch size number of hidden layers number of units per hidden layer the learning rate of the optimizer the optimizer and so on.
+
+##### Image classification
