@@ -255,3 +255,45 @@ print(sample_batch_input.shape,sample_batch_labels.shape)
     - When we have flattened our image, we end up with an input of size 65536 features. We then need a matrix of size [65536 by 100] to transform this input into a layer with 100 units! This feed-forward model will struggle to learn meaningful combinations of so many features for those next hidden units.
 - convolutional layers: allow us to scale down our input image into meaningful features while using only a fraction of the parameters required in a linear layer.
 - Convolutional Neural Networks (CNNs) use layers specifically designed for image data. These layers capture local relationships between nearby features in an image.
+    - we learn a set of smaller weight tensors, called filters (also known as kernels). We move each of these filters (i.e. convolve them) across the height and width of our input, to generate a new “image” of features. Each new “pixel” results from applying the filter to that location in the original image.
+    - Convolution can reduce the size of an input image using only a few parameters.
+    - Filters compute new features by only combining features that are near each other in the image. This operation encourages the model to look for local patterns (e.g., edges and objects).
+    - Convolutional layers will produce similar outputs even when the objects in an image are translated (For example, if there were a giraffe in the bottom or top of the frame). This is because the same filters are applied across the entire image
+    - With deep nets, we can learn each weight in our filter (along with a bias term)! Typically, we randomly initialize our filters and use gradient descent to learn a better set of weights. By randomly initializing our filters, we ensure that different filters learn different types of information, like vertical versus horizontal edge detectors.
+- Configuring filters for convolutional layer
+    - Define a Conv2D layer to handle the forward and backward passes of convolution: 
+    ```py
+    #Defines a convolutional layer with 4 filters, each of size 5 by 5:
+    tf.keras.layers.Conv2D(4, 5, activation="relu"))
+    ```
+    - Then we stack these outputs of multiple filters together in a new “image.”  
+    - Our output tensor is then (batch_size, new height, new width, number of filters). We call this last dimension number of channels ( or feature maps ). 
+    - Filter size: [height,width,input channels], Keras takes care of the last dimension for us.
+    - The number of parameters in a convolution layer: number of filters*(Input channels*height*Width + 1)  [Every filter has height, width, and thickness (The number of input channels), along with a bias term.]
+- Configuring stride and padding for convolutional layers:
+    - The stride hyperparameter is how much we move the filter each time we apply it: `model.add(tf.keras.layers.Conv2D(8, 5 strides=3, activation="relu"))`
+    - The padding hyperparameter defines what we do once our filter gets to the end of a row/column.
+        - The default option is to just stop when our kernel moves off the image. 
+        - Another option is to pad our input by surrounding our input with zeros. This approach is called “same” padding, because if stride=1, the output of the layer will be the same height and width as the input: `model.add(tf.keras.layers.Conv2D(8, 5,strides=3,padding='same',activation="relu"))`
+- Adding convolutional layers to model
+    - Adding one convolutional layer: replace the first Dense layers with a Conv2D layer. Then, we want to move the Flatten layer between the convolutional and last dense  layer. 
+    - Stacking Convolutional Layers (with distinct filter shapes and strides)
+    ```py
+    # 8 5x5 filters, with strides of 3
+    model.add(tf.keras.layers.Conv2D(8, 5,  strides=3, activation="relu"))
+    
+    # 4 3x3 filters, with strides of 3
+    model.add(tf.keras.layers.Conv2D(4, 3,  strides=3, activation="relu"))
+    
+    # 2 2x2 filters, with strides of 2
+    model.add(tf.keras.layers.Conv2D(2, 3,  strides=2, activation="relu"))
+    # The number of filters used in the previous layer becomes the number of channels that we input into the next!
+    ```
+    - As with dense layers, we should use non-linear activation functions between these convolutional layers.
+- Another part of Convolutional Networks is Pooling Layers: layers that pool local information to reduce the dimensionality of intermediate convolutional outputs.
+    - Most common type is Max pooling: instead of multiplying each image patch by a filter, we replace the patch with its maximum value: `max_pool_2d = tf.keras.layers.MaxPooling2D(pool_size=(3, 3),   strides=(3, 3), padding='valid')`
+    - max pooling layers have another useful property: they provide some amount of translational invariance. In other words, even if we move around objects in the input image, the output will be the same. 
+- Training the model:
+    - Define another ImageDataGenerator and use it to load our validation data.
+    - Compile our model with an optimizer, metric, and a loss function.
+    - Train our model using model.fit().
