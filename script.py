@@ -715,3 +715,23 @@ print(sample_batch_input.shape,sample_batch_labels.shape)
 #Found 200 images belonging to 2 classes.
 #(32, 256, 256, 1) (32, 2)
 # The last dimension is the number of channels. Because these are grayscale images, there is only one channel representing light intensity. Sample_batch_labels should be shape of (32,2), because an image can be labeled Normal ([1,0]) or Pneumonia ([0,1]).
+
+## Modifying our Feed-Forward Classification Model
+import tensorflow as tf
+
+model = tf.keras.Sequential()
+
+#Add an input layer that will expect grayscale input images of size 256x256:
+model.add(tf.keras.Input(shape=(256,256,1)))
+
+#Use a Flatten() layer to flatten the image into a single vector:
+model.add(tf.keras.layers.Flatten())
+
+model.add(tf.keras.layers.Dense(100,activation="relu"))
+model.add(tf.keras.layers.Dense(50,activation="relu"))
+model.add(tf.keras.layers.Dense(2,activation="softmax"))
+
+#Print model information:
+model.summary() 
+# 6.5 million trainable parameters 
+# This means that we have over 1000x more parameters than data points! As a result this model will not only take a significant amount of compute to train, but it will also easily overfit to our training data.

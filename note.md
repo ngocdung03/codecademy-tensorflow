@@ -249,3 +249,9 @@ print(classification_report(y_true, yhat_classes))
 sample_batch_input,sample_batch_labels  = training_iterator.next()
 print(sample_batch_input.shape,sample_batch_labels.shape)
 ```
+- Feed-forward classification model to classify image: One way is to treat an image as a vector of pixels:
+    - Change the shape of input layer to accept image data: (image height, image width, image channels): `model.add(tf.keras.Input(shape=(512,512,3)))`
+    - "Flatten" input image into a single vector: `model.add(tf.keras.layers.Flatten())`
+    - When we have flattened our image, we end up with an input of size 65536 features. We then need a matrix of size [65536 by 100] to transform this input into a layer with 100 units! This feed-forward model will struggle to learn meaningful combinations of so many features for those next hidden units.
+- convolutional layers: allow us to scale down our input image into meaningful features while using only a fraction of the parameters required in a linear layer.
+- Convolutional Neural Networks (CNNs) use layers specifically designed for image data. These layers capture local relationships between nearby features in an image.
