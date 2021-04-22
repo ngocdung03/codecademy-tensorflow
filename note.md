@@ -297,3 +297,13 @@ print(sample_batch_input.shape,sample_batch_labels.shape)
     - Define another ImageDataGenerator and use it to load our validation data.
     - Compile our model with an optimizer, metric, and a loss function.
     - Train our model using model.fit().
+
+##### Application of deep learning
+- Recurrent Neural Network (RNN): Rather than just concatenating our input words together, RNNs process them sequentially. For every input word in order, we pass that word to our model. At each timestep, the input is then used to update the model’s hidden state. If we just want to predict the last word, we simply feed all but the last word into the model, then use the final hidden state to predict the next word. Alternatively, if we want to generate the entire sentence, we can feed a starting word in, update the hidden state, generate a new word, then pass that back into the new model, and so on.
+- autoencoders:
+    - The Encoder encodes input, and compresses it into a smaller latent representation, referred to as the Code.
+    - The Decoder tries to reconstruct the input.
+    - Our loss is the difference between our output and the original input. This is called the reconstruction loss.
+- Autoencoders have many uses. For one, they can be used as a preprocessing step, to compress documents and images. These smaller vectors can also be used in downstream tasks like classification, clustering, or information retrieval.
+- Without any additional labeled data, autoencoders can also be used for anomaly detection: the identification of rare, or suspicious data points (e.g. fake documents or credit card fraud).
+- Generative Adversarial Networks (GANs).
