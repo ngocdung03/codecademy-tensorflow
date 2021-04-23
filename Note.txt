@@ -1,0 +1,3 @@
+implementing neural network - project 1: step 19
+
+data folders of image classification lession

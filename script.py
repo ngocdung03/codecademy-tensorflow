@@ -824,7 +824,7 @@ training_data_generator = ImageDataGenerator(
         width_shift_range=0.05,
         height_shift_range=0.05)
 
-training_iterator = training_data_generator.flow_from_directory('data/train',class_mode='categorical',color_mode='grayscale',batch_size=BATCH_SIZE)
+training_iterator = training_data_generator.flow_from_directory('data/train',class_mode='categorical',color_mode='grayscale',batch_size=BATCH_SIZE) # can be just .flow() if the data is already loaded in the environment
 
 print("\nLoading validation data...")
 

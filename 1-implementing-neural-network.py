@@ -45,6 +45,9 @@ opt = Adam(learning_rate =0.01)
 my_model.compile(loss='mse', metrics=['mae'], optimizer=opt)
 #train
 my_model.fit(features_train_scaled, labels_train, epochs=40, batch_size=1, verbose=1)
+#ValueError: Failed to convert a NumPy array to a Tensor (Unsupported object type float).
+
+
 #print(labels_train.unique())
 res_mse, res_mae = my_model.evualuate(features_test_scaled, labels_test)
 print(res_mse)
