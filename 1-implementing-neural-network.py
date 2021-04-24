@@ -7,7 +7,6 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import InputLayer
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
-from sklearn.preprocessing import LabelEncoder
 
 dataset = pd.read_csv('life_expectancy.csv')
 print(dataset.head())
@@ -15,11 +14,11 @@ print(dataset.describe())
 # Drop 'Country' because to create a predictive model, knowing from which country data comes can be confusing and it is not a column we can generalize over.
 dataset = dataset.drop(['Country'], axis=1)
 
-labels = dataset.iloc[:,-1]
-features = dataset.iloc[:,0:-1]
-
 # apply one-hot-encoding on all the categorical columns
 dataset = pd.get_dummies(dataset)
+
+labels = dataset.iloc[:,-1]
+features = dataset.iloc[:,0:-1]
 
 # split the data
 features_train, features_test, labels_train, labels_test = train_test_split(features, labels, test_size = 0.2, random_state=1)
@@ -29,9 +28,6 @@ numerical_features = features_train.select_dtypes(include=['float64', 'int64']) 
 ct = ColumnTransformer([("only numeric", StandardScaler(), numerical_features.columns)], remainder='passthrough')  
 features_train_scaled = ct.fit_transform(features_train)
 features_test_scaled = ct.transform(features_test)
-# le=LabelEncoder()
-# labels_train=le.fit_transform(labels_train.astype(str))
-# labels_test=le.transform(labels_test.astype(str))
 
 # Building the model
 my_model = Sequential()
@@ -47,8 +43,6 @@ my_model.compile(loss='mse', metrics=['mae'], optimizer=opt)
 my_model.fit(features_train_scaled, labels_train, epochs=40, batch_size=1, verbose=1)
 #ValueError: Failed to convert a NumPy array to a Tensor (Unsupported object type float).
 
-
 #print(labels_train.unique())
 res_mse, res_mae = my_model.evualuate(features_test_scaled, labels_test)
-print(res_mse)
-print(res_mae)
+print(res_mse, res_mae)
